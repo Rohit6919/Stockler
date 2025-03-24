@@ -16,10 +16,10 @@ function Header() {
         <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse">
           <img 
             src={Logo} 
-            className="h-15 w-auto" // Adjust the width as needed
+            className="h-10 w-auto" // Adjust the width as needed
             alt="Logo" 
           />
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Stockler</span>
+          <span className="self-center text-3xl font-bold whitespace-nowrap text-white">Stockler</span>
         </Link>
 
         {/* Button for mobile menu */}
@@ -41,17 +41,17 @@ function Header() {
         <div className={`md:flex md:w-auto w-full ${isOpen ? 'block' : 'hidden'}`} id="navbar-default">
           <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0">
             <li>
-              <Link to="/" className="block py-2 px-3 text-lg text-white bg-blue-700 rounded-sm md:bg-transparent md:p-0" aria-current="page">
+              <Link to="/" className="block py-2 px-3 text-lg text-white bg-orange-700 rounded-sm md:bg-transparent md:p-0" aria-current="page">
                 Home
               </Link>
             </li>
             <li>
-              <Link to="/Signup" className="block py-2 px-3 text-lg text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+              <Link to="/Signup" className="block py-2 px-3 text-lg text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-orange-700 md:p-0 dark:text-white md:dark:hover:text-orange-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
                 Sign Up
               </Link>
             </li>
             <li>
-              <Link to="/LoginIn" className="block py-2 px-3 text-lg text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+              <Link to="/LoginIn" className="block py-2 px-3 text-lg text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-orange-700 md:p-0 dark:text-white md:dark:hover:text-orange-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
                 Log In
               </Link>
             </li>
