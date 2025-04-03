@@ -11,7 +11,7 @@ function Home() {
             <h1 className="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl text-white">
               Stockler : Track smart, trade smarter
             </h1>
-            <p className="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl text-white">
+            <p className="max-w-2xl mb-6 font-light  lg:mb-8 md:text-lg lg:text-xl text-white">
               With Stockler, track your favorite stocks and stay updated on market movements to make smarter trading decisions.
             </p>
             <Link to="/signup" className="inline-flex items-center justify-center px-5 py-3 mr-3 text-base font-medium text-center text-black rounded-lg bg-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300">
@@ -35,10 +35,10 @@ function Home() {
 
           {/* Content Section */}
           <div className="mt-4 md:mt-0">
-            <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">
+            <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-white dark:text-white">
               If you're new to stock investment, check out EliteProWealth for low-risk, high-return opportunities.
             </h2>
-            <p className="mb-6 font-light text-gray-500 md:text-lg dark:text-gray-400">
+            <p className="mb-6 font-light text-white md:text-lg dark:text-gray-400">
               Whether you're just starting or looking for solid investment options, EliteProWealth offers valuable insights and strategies to guide your journey.
             </p>
 

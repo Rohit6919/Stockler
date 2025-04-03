@@ -1,12 +1,13 @@
-const express =require('express')
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
+const authMiddleware = require("../middleware/authMiddleware");
+
 const { getRealtimeStock } = require("../controllers/realtimeController");
+const { getAllStocks, addStock, deleteStock } = require("../controllers/stockController");
 
-const { getAllStocks , addStock , deleteStock } = require("../controllers/stockController")
-
-router.get('/',getAllStocks);
-router.post('/',addStock);
-router.delete('/:id',deleteStock);
+router.get("/", authMiddleware, getAllStocks);
+router.post("/", authMiddleware, addStock);
+router.delete("/:id", authMiddleware, deleteStock);
 
 router.get("/realtime/:symbol", getRealtimeStock);
 
