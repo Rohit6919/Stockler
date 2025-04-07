@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [tailwindcss(),react()],
   server: {
     host: '0.0.0.0', // This will allow connections from any IP address on the local network
-    port: 3000, // Set the port you want (you can change this if needed)
+    port: 3000,
+    historyApiFallback: true, // Set the port you want (you can change this if needed)
   },
 })
