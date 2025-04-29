@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 const BACKEND_URL = "http://localhost:5000/api";
-const RAPID_API_KEY = "fddc19a597msh9620cdd52bd60b7p1ace8ajsn32068453019b";
+const ALPHA_API_KEY = "JFPMH04HGPAMMMDL";
 
 const Watchlist = () => {
   const [watchlist, setWatchlist] = useState([]);
@@ -9,25 +9,24 @@ const Watchlist = () => {
   const [stockSymbol, setStockSymbol] = useState("");
   const [isAdding, setIsAdding] = useState(false);
 
+  // Fetch stock prices from Alpha Vantage
   const fetchLivePrices = async (symbols) => {
     const results = await Promise.all(
       symbols.map(async (item) => {
         try {
           const res = await fetch(
-            `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${item.symbol}&region=IN`,
-            {
-              method: "GET",
-              headers: {
-                "X-RapidAPI-Key": RAPID_API_KEY,
-                "X-RapidAPI-Host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
-              },
-            }
+            `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${item.symbol}&apikey=${ALPHA_API_KEY}`
           );
           const data = await res.json();
+
+          const quote = data["Global Quote"];
+          const price = quote?.["05. price"];
+          const changePercent = quote?.["10. change percent"];
+
           return {
             ...item,
-            price: data.price?.regularMarketPrice?.raw || "N/A",
-            change: data.price?.regularMarketChangePercent?.fmt || "N/A",
+            price: price ? parseFloat(price) : "N/A",
+            change: changePercent || "N/A",
           };
         } catch (err) {
           console.error("Error fetching price:", err);
@@ -35,26 +34,23 @@ const Watchlist = () => {
         }
       })
     );
+
     setWatchlist(results);
     setLoading(false);
   };
 
+  // Load user's watchlist from backend
   const fetchWatchlist = async () => {
     try {
       const res = await fetch(`${BACKEND_URL}/stocks/watchlist`, {
         credentials: "include",
       });
       const data = await res.json();
-      console.log("Raw watchlist from backend:", data.watchlist);
 
-      if (res.ok) {
-        setWatchlist(data.watchlist || []);
-        if (data.watchlist?.length > 0) {
-          fetchLivePrices(data.watchlist);
-        } else {
-          setLoading(false);
-        }
+      if (res.ok && data.watchlist?.length > 0) {
+        fetchLivePrices(data.watchlist);
       } else {
+        setWatchlist([]);
         setLoading(false);
       }
     } catch (error) {
@@ -87,8 +83,6 @@ const Watchlist = () => {
       });
 
       const text = await res.text();
-      console.log("Add stock response:", text);
-
       let data;
       try {
         data = JSON.parse(text);
@@ -97,24 +91,20 @@ const Watchlist = () => {
       }
 
       if (res.ok) {
-        // Fetch live price for the newly added stock
+        // Fetch price from Alpha Vantage
         const priceRes = await fetch(
-          `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${upperSymbol}&region=IN`,
-          {
-            method: "GET",
-            headers: {
-              "X-RapidAPI-Key": RAPID_API_KEY,
-              "X-RapidAPI-Host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
-            },
-          }
+          `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${upperSymbol}&apikey=${ALPHA_API_KEY}`
         );
         const priceData = await priceRes.json();
+        const quote = priceData["Global Quote"];
+        const price = quote?.["05. price"];
+        const changePercent = quote?.["10. change percent"];
 
         const newStock = {
           symbol: upperSymbol,
           name: upperSymbol,
-          price: priceData.price?.regularMarketPrice?.raw || "N/A",
-          change: priceData.price?.regularMarketChangePercent?.fmt || "N/A",
+          price: price ? parseFloat(price) : "N/A",
+          change: changePercent || "N/A",
         };
 
         setWatchlist((prev) => [newStock, ...prev]);
@@ -134,13 +124,13 @@ const Watchlist = () => {
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold text-center mb-4">📊 Your Watchlist</h1>
 
-      {/* Search & Add */}
+      {/* Add Stock Input */}
       <div className="flex justify-center mb-6 gap-2">
         <input
           type="text"
-          placeholder="Enter Stock Symbol (e.g., RELIANCE.BO, TCS.NS)"
+          placeholder="Enter Stock Symbol"
           value={stockSymbol}
-          onChange={(e) => setStockSymbol(e.target.value)}
+          onChange={(e) => setStockSymbol(e.target.value.toUpperCase())}
           className="border border-gray-300 p-2 rounded w-64"
         />
         <button

@@ -45,8 +45,8 @@ const loginUser = async (req, res) => {
             maxAge: 24 * 60 * 60 * 1000, // ✅ Token expires in 1 day
         });
 
-        console.log("✅ Login successful - Token set in cookie");
-        res.json({ message: "Login successful" });
+        
+        res.json({ message: "Login successful" , token});
     } catch (error) {
         console.error("❌ Login error:", error);
         res.status(500).json({ message: "Server error" });

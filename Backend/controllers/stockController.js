@@ -1,84 +1,83 @@
 const Stock = require("../models/stock")
 const mongoose = require("mongoose");
+const User = require("../models/User");
 
-const getAllStocks = async (req, res) => {
+
+const addToWatchlist = async (req, res) => {
+    const { userId } = req.user;
+    const { symbol, name } = req.body;
+  
     try {
-        const stocks = await Stock.find().sort({ updatedAt: -1 });
-
-        if (!stocks || stocks.length === 0) {
-            return res.status(404).json({ message: "No stocks found" });
-        }
-
-        res.status(200).json(stocks);
-
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // Prevent duplicates
+      const alreadyExists = user.watchlist.some(stock => stock.symbol === symbol);
+      if (alreadyExists) {
+        return res.status(400).json({ message: "Stock already in watchlist" });
+      }
+  
+      // Add stock
+      user.watchlist.push({ symbol, name });
+      await user.save();
+  
+      res.status(200).json({ message: "Stock added", watchlist: user.watchlist });
     } catch (error) {
-        console.error("Error:", error.message); // Log the detailed error message
-        res.status(500).json({ message: "Server Error", error: error.message });
+      console.error("Error adding stock:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
     }
-};
+  };
 
 
-const addStock = async (req, res) => {
-    const { symbol, name, price, change = 0, percentageChange = 0, high = 0, low = 0, volume = 0 } = req.body;
-
-    if (!symbol || !name || !price) {
-        return res.status(400).json({ message: "Please provide symbol, name, and price" });
-    }
-
+// ✅ Remove stock from watchlist
+const removeFromWatchlist = async (req, res) => {
+    const { userId } = req.user;
+    const { symbol } = req.params;
+  
     try {
-        const newStock = new Stock({
-            symbol,
-            name,
-            price,
-            change,
-            percentageChange,
-            high,
-            low,
-            volume,
-        });
-
-        const savedStock = await newStock.save();
-        res.status(201).json(savedStock);
-
-    } catch (error) {
-        console.error("Error:", error);
-        res.status(500).json({ message: "Failed to add new stock" });
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ message: "User not found" });
+  
+      const beforeLength = user.watchlist.length;
+      user.watchlist = user.watchlist.filter(stock => stock.symbol !== symbol);
+      const afterLength = user.watchlist.length;
+  
+      if (beforeLength === afterLength) {
+        return res.status(404).json({ message: "Stock not found in watchlist" });
+      }
+  
+      await user.save();
+  
+      res.status(200).json({ message: "Stock removed", watchlist: user.watchlist });
+    } catch (err) {
+      console.error("❌ Error removing stock:", err);
+      res.status(500).json({ message: "Server error", error: err.message });
     }
-};
+  };
+  
 
-
-const deleteStock = async (req, res) => {
-    const { id } = req.params;
-    console.log("Raw ID from request:", id);
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        console.log("Invalid ID format:", id);
-        return res.status(400).json({ message: "Invalid ID format" });
-    }
-
-    try {
-        const stock = await Stock.findById(id);
-        if (!stock) {
-            console.log("Stock not found in DB:", id);
-            return res.status(404).json({ message: "Stock not found" });
-        }
-
-        await Stock.findByIdAndDelete(id);
-        console.log("Stock deleted successfully:", id);
-        res.status(200).json({ message: "Stock deleted successfully" });
-
-    } catch (error) {
-        console.error("Error deleting stock:", error.message);
-        res.status(500).json({ 
-            message: "Failed to delete stock", 
-            error: error.message 
-        });
-    }
-};
-
-
-  module.exports = {
-    getAllStocks,
-    addStock,
-    deleteStock,
+// ✅ Get user's watchlist
+const getWatchlist = async (req, res) => {
+  const { userId } = req.user;
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    
+    // Wrap the watchlist in an object to match frontend expectation
+    res.status(200).json({ watchlist: user.watchlist });
+  } catch (error) {
+    console.error("Error getting watchlist:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
+};
+
+
+
+// ✅ Export watchlist functions
+module.exports = {
+    addToWatchlist,
+    removeFromWatchlist,
+    getWatchlist
+};
